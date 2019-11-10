@@ -16,6 +16,7 @@ import androidx.appcompat.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.dariushm2.universify.App;
 import com.dariushm2.universify.R;
 import com.dariushm2.universify.model.PictureOfTheDay;
 import com.dariushm2.universify.remote.NasaServices;
@@ -88,7 +89,10 @@ public class ScrollingActivity extends AppCompatActivity {
     }
 
     private void getNextPicture() {
-        NasaServices.REMOTE_API
+
+            App app = (App) getApplication();
+
+            app.getNasaServices()
                 .getPictureOfTheDay(NasaServices.API_KEY, dateFormat.format(cal.getTime()))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

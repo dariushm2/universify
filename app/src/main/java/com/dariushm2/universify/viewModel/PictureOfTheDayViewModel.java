@@ -10,6 +10,6 @@ import retrofit2.Response;
 
 public class PictureOfTheDayViewModel extends ViewModel {
 
-    public Single<Response<PictureOfTheDay>> pictureOfTheDay = NasaServices.REMOTE_API.getPictureOfTheDay(NasaServices.API_KEY);
+    //public Single<Response<PictureOfTheDay>> pictureOfTheDay = NasaServices.REMOTE_API.getPictureOfTheDay(NasaServices.API_KEY);
 
 }
