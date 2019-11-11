@@ -1,25 +1,40 @@
 package com.dariushm2.universify.remote;
 
-import com.dariushm2.universify.model.ImageItems;
-import com.dariushm2.universify.model.ImageLink;
-import com.dariushm2.universify.model.ImageLinks;
+import com.dariushm2.universify.model.backend.ImageSearch;
 import com.dariushm2.universify.model.PictureOfTheDay;
 
-import java.util.List;
-
+import io.reactivex.Flowable;
 import io.reactivex.Single;
 import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
 
 public interface NasaServices {
 
+    String BASE_URL_IMAGE_LIBRARY = "https://images-api.nasa.gov";
+    NasaServices NASA_SERVICES = new Retrofit.Builder()
+            .baseUrl(NasaServices.BASE_URL)
+            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(NasaServices.class);
+
+
     String API_KEY = "61oeOYHyVnw4ZYue06NKOooohsmaWQy4cmGsNrwi";
-    String BASE_URL = "https://images-api.nasa.gov";
+    String MEDIA_TYPE_IMAGE = "image";
+    String BASE_URL = "https://api.nasa.gov/";
 
 
     @GET("/search")
-    Single<Response<ImageItems>> getSearchPictures(@Query("q") String query);
+    Single<Response<ImageSearch>> getSearchPictures(@Query("q") String query);
+
+    @GET("/search")
+    Flowable<ImageSearch> getSearchPictures(@Query("q") String query,
+                                                      @Query("media_type") String mediaType,
+                                                      @Query("page") int pageNumber);
 
 
     @GET("planetary/apod")

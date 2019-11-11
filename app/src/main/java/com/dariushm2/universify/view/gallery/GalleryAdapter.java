@@ -1,6 +1,8 @@
 package com.dariushm2.universify.view.gallery;
 
 import android.content.Context;
+import android.content.Intent;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -11,18 +13,22 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.dariushm2.universify.R;
-import com.dariushm2.universify.model.PictureOfTheDay;
+import com.dariushm2.universify.model.backend.ImageLink;
+import com.dariushm2.universify.model.frontend.GalleryModel;
+import com.dariushm2.universify.view.image.ImageActivity;
 
 import java.util.List;
 
 public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHolder> {
 
-    private List<PictureOfTheDay> pictures;
+    private List<GalleryModel> galleryModels;
     private Context context;
 
 
-    public GalleryAdapter(List<PictureOfTheDay> pictures, Context context) {
-        this.pictures = pictures;
+
+
+    public GalleryAdapter(List<GalleryModel> galleryModels, Context context) {
+        this.galleryModels = galleryModels;
         this.context = context;
     }
 
@@ -30,24 +36,36 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
-        return new ViewHolder(parent);
+        Context context = parent.getContext();
+        LayoutInflater inflater = LayoutInflater.from(context);
+
+        View galleryItem = inflater.inflate(R.layout.gallery_item, parent, false);
+
+        return new ViewHolder(galleryItem);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
-        PictureOfTheDay picture = pictures.get(position);
+        GalleryModel galleryModel = galleryModels.get(position);
 
         Glide.with(context)
-                .load(picture.getUrl())
+                .load(galleryModel.getThumbnailUrl())
+                .override(200, 200)
                 .apply(RequestOptions.centerCropTransform())
                 .into(holder.imageView);
+
+        holder.imageView.setOnClickListener(view -> {
+                Intent intent = new Intent(context, ImageActivity.class);
+                intent.putExtra("position", position);
+                context.startActivity(intent);
+        });
 
     }
 
     @Override
     public int getItemCount() {
-        return pictures.size();
+        return galleryModels.size();
     }
 
     @Override

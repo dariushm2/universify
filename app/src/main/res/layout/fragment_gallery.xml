@@ -1,12 +1,174 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/btnUniverse"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:background="@drawable/button_selector"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:paddingBottom="7dp"
+                android:paddingTop="7dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:text="@string/universe"
+                android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                android:textColor="@android:color/primary_text_dark" />
+
+            <TextView
+                android:id="@+id/btnApollo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:background="@drawable/button_selector"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:paddingBottom="7dp"
+                android:paddingTop="7dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:text="@string/apollo"
+                android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                android:textColor="@android:color/primary_text_dark" />
+
+            <TextView
+                android:id="@+id/btnMars"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:background="@drawable/button_selector"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:paddingBottom="7dp"
+                android:paddingTop="7dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:text="@string/mars"
+                android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                android:textColor="@android:color/primary_text_dark" />
+
+            <TextView
+                android:id="@+id/btnISS"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:background="@drawable/button_selector"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:paddingBottom="7dp"
+                android:paddingTop="7dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:text="@string/iss"
+                android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                android:textColor="@android:color/primary_text_dark" />
+
+            <TextView
+                android:id="@+id/btnMoon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:background="@drawable/button_selector"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:paddingBottom="7dp"
+                android:paddingTop="7dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:text="@string/moon"
+                android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                android:textColor="@android:color/primary_text_dark" />
+
+            <TextView
+                android:id="@+id/btnCuriosity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:background="@drawable/button_selector"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:paddingBottom="7dp"
+                android:paddingTop="7dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:text="@string/curiosity"
+                android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                android:textColor="@android:color/primary_text_dark" />
+
+            <TextView
+                android:id="@+id/btnVoyager"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:background="@drawable/button_selector"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:paddingBottom="7dp"
+                android:paddingTop="7dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:text="@string/voyager"
+                android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                android:textColor="@android:color/primary_text_dark" />
+
+            <TextView
+                android:id="@+id/btnShuttle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:background="@drawable/button_selector"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:paddingBottom="7dp"
+                android:paddingTop="7dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:text="@string/shuttle"
+                android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                android:textColor="@android:color/primary_text_dark" />
+
+            <TextView
+                android:id="@+id/btnRocket"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:background="@drawable/button_selector"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:paddingBottom="7dp"
+                android:paddingTop="7dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:text="@string/rocket"
+                android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                android:textColor="@android:color/primary_text_dark" />
+        </LinearLayout>
+
+    </HorizontalScrollView>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_margin="5dp"
+
         />
 </LinearLayout>

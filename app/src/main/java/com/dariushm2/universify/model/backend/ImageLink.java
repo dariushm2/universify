@@ -1,4 +1,4 @@
-package com.dariushm2.universify.model;
+package com.dariushm2.universify.model.backend;
 
 import com.google.gson.annotations.SerializedName;
 

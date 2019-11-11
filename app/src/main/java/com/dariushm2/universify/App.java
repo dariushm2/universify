@@ -55,7 +55,7 @@ public class App extends Application {
 
     private Retrofit provideRetrofit() {
         return new Retrofit.Builder()
-                .baseUrl(NasaServices.BASE_URL)
+                .baseUrl(NasaServices.BASE_URL_IMAGE_LIBRARY)
                 .client(provideOkHttpClient())
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
