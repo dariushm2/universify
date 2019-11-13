@@ -1,5 +1,6 @@
 package com.dariushm2.universify.model.frontend;
 
+
 public class GalleryModel {
 
     public static final String MEDIA_TYPE_IMAGE = "image";

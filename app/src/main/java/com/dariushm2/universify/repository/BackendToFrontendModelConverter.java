@@ -46,29 +46,29 @@ public class BackendToFrontendModelConverter {
                     Log.e(App.TAG, "fetchImages " + imageSearch.getCollection().getImageItems().size());
 
                     for (int i = 0; i < imageSearch.getCollection().getImageItems().size(); i++) {
-                        Log.e(App.TAG, "index " + i);
+
                         if (imageSearch.getCollection().getImageItems().get(i).getImageLinks() != null) {
 
                             String nasaId = imageSearch.getCollection()
                                     .getImageItems().get(i)
                                     .getImageDatas().get(0)
                                     .getNasaId();
-                            Log.e(App.TAG, "converter " + nasaId);
+
                             String title = imageSearch.getCollection()
                                     .getImageItems().get(i)
                                     .getImageDatas().get(0)
                                     .getTitle();
-                            Log.e(App.TAG, "converter " + title);
+
                             String description = imageSearch.getCollection()
                                     .getImageItems().get(i)
                                     .getImageDatas().get(0)
                                     .getDescription();
-                            Log.e(App.TAG, "converter " + description);
+
                             String thumbnailUrl = imageSearch.getCollection()
                                     .getImageItems().get(i)
                                     .getImageLinks().get(0)
                                     .getUrl();
-                            Log.e(App.TAG, "converter " + thumbnailUrl);
+
                             GalleryModel galleryModel = new GalleryModel(
                                     GalleryModel.MEDIA_TYPE_IMAGE,
                                     nasaId,

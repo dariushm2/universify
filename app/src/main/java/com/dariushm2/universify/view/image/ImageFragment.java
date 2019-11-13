@@ -3,47 +3,49 @@ package com.dariushm2.universify.view.image;
 import android.app.WallpaperManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.widget.ContentLoadingProgressBar;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.Target;
 import com.dariushm2.universify.App;
 import com.dariushm2.universify.R;
-import com.dariushm2.universify.model.PictureOfTheDay;
-import com.dariushm2.universify.remote.NasaServices;
+import com.dariushm2.universify.repository.GalleryPresenter;
+import com.github.chrisbanes.photoview.PhotoView;
 
 import java.io.IOException;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 
-import io.reactivex.SingleObserver;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
-import retrofit2.Response;
+public class ImageFragment extends Fragment implements ImageDataEvents {
 
-public class ImageFragment extends Fragment {
 
-    private ScaleGestureDetector mScaleGestureDetector;
-    private float mScaleFactor = 1.0f;
+    private ImageDataEvents imageDataEvents;
 
     private int position;
 
-    private ImageView imageView;
+    private PhotoView imageView;
+    private ContentLoadingProgressBar progressBar;
+
     private boolean isBottomBarVisible = false;
 
     private ImageFragment(int position) {
@@ -54,12 +56,24 @@ public class ImageFragment extends Fragment {
         return new ImageFragment(position);
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_image, container, false);
 
+        imageDataEvents = this;
+
         imageView = view.findViewById(R.id.img);
+
+        progressBar = view.findViewById(R.id.progressBar);
+
+
         final LinearLayout bottomBar = view.findViewById(R.id.bottomBar);
         TextView btnSetAsWallpaper = view.findViewById(R.id.btnSetAsWallpaper);
         btnSetAsWallpaper.setOnClickListener(v -> {
@@ -68,68 +82,55 @@ public class ImageFragment extends Fragment {
             try {
                 Bitmap bitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
                 myWallpaperManager.setBitmap(bitmap);
+                Toast.makeText(getContext(), R.string.wallpaperChanged, Toast.LENGTH_LONG).show();
             } catch (IOException e) {
                 // TODO Auto-generated catch block
+                Toast.makeText(getContext(), R.string.failedToChangeWallpaper, Toast.LENGTH_LONG).show();
                 e.printStackTrace();
             }
         });
 
-        imageView.setOnTouchListener((v, motionEvent) -> {
-
-            switch (motionEvent.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    return true;
-                case MotionEvent.ACTION_UP:
-                    imageView.performClick();
-                    return true;
-                default:
-                    mScaleGestureDetector.onTouchEvent(motionEvent);
-            }
-
-            return true;
-
-        });
         imageView.setOnClickListener(v -> {
             bottomBar.setVisibility(isBottomBarVisible ? View.GONE : View.VISIBLE);
             isBottomBarVisible = !isBottomBarVisible;
         });
-        mScaleGestureDetector = new ScaleGestureDetector(getContext(), new ScaleListener());
-        getImage();
+
+
+        if (getActivity() != null) {
+            App app = (App) getActivity().getApplication();
+            GalleryPresenter.getUrlsFor(app.getNasaServices(), position, imageDataEvents);
+        }
 
         return view;
     }
 
 
-    private void getImage() {
-        NasaServices.NASA_SERVICES
-                .getPictureOfTheDay(NasaServices.API_KEY,
-                        getDate())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new SingleObserver<Response<PictureOfTheDay>>() {
-                    @Override
-                    public void onSubscribe(Disposable d) {
+    @Override
+    public void showImage() {
 
-                    }
+        Log.e(App.TAG, "showImage " + GalleryPresenter.getImageData(position).getOriginalUrl());
 
-                    @Override
-                    public void onSuccess(Response<PictureOfTheDay> response) {
-
-                        if (response.body() != null) {
-                            Log.e(App.TAG, "onSuccess: ");
-                            if (getActivity() != null)
-                                Glide.with(getActivity())
-                                        .load(response.body().getUrl())
-                                        .apply(RequestOptions.centerCropTransform())
-                                        .into(imageView);
+        if (getActivity() != null)
+            Glide.with(getActivity())
+                    .load(GalleryPresenter.getImageData(position).getOriginalUrl())
+                    .listener(new RequestListener<Drawable>() {
+                        @Override
+                        public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                            if (e != null)
+                                Log.e(App.TAG, e.getMessage());
+                            progressBar.hide();
+                            Toast.makeText(getContext(), R.string.unsupportedFormat, Toast.LENGTH_LONG).show();
+                            return false;
                         }
-                    }
 
-                    @Override
-                    public void onError(Throwable e) {
-
-                    }
-                });
+                        @Override
+                        public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                            progressBar.hide();
+                            return false;
+                        }
+                    })
+                    .apply(RequestOptions.centerCropTransform())
+                    .into(imageView);
 
     }
 
@@ -142,16 +143,4 @@ public class ImageFragment extends Fragment {
         return dateFormat.format(calendar.getTime());
     }
 
-
-    private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
-        @Override
-        public boolean onScale(ScaleGestureDetector scaleGestureDetector) {
-            mScaleFactor *= scaleGestureDetector.getScaleFactor();
-            mScaleFactor = Math.max(1.0f,
-                    Math.min(mScaleFactor, 10.0f));
-            imageView.setScaleX(mScaleFactor);
-            imageView.setScaleY(mScaleFactor);
-            return true;
-        }
-    }
 }

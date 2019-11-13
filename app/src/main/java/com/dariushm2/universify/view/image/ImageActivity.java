@@ -16,8 +16,11 @@ import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 import com.dariushm2.universify.R;
+import com.dariushm2.universify.repository.GalleryPresenter;
 
 public class ImageActivity extends AppCompatActivity {
+
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

@@ -13,6 +13,10 @@
     <string name="setAsWallpaper">Set as Wallpaper</string>
     <string name="searchHint">Search a keyword</string>
 
+    <string name="unsupportedFormat">Image format is unsupported \u2639</string>
+    <string name="failedToChangeWallpaper">Failed to change wallpaper!</string>
+    <string name="wallpaperChanged">Wallpaper changed</string>
+
     <string name="universe">Universe</string>
     <string name="apollo">Apollo</string>
     <string name="mars">Mars</string>

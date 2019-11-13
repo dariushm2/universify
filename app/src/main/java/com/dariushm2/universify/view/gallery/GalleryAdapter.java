@@ -22,14 +22,14 @@ import java.util.List;
 public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHolder> {
 
     private List<GalleryModel> galleryModels;
-    private Context context;
+    private GalleryFragment galleryFragment;
 
 
 
 
-    public GalleryAdapter(List<GalleryModel> galleryModels, Context context) {
+    public GalleryAdapter(List<GalleryModel> galleryModels, GalleryFragment galleryFragment) {
         this.galleryModels = galleryModels;
-        this.context = context;
+        this.galleryFragment = galleryFragment;
     }
 
     @NonNull
@@ -49,17 +49,14 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
 
         GalleryModel galleryModel = galleryModels.get(position);
 
-        Glide.with(context)
+        if (galleryFragment.getContext() != null)
+            Glide.with(galleryFragment.getContext())
                 .load(galleryModel.getThumbnailUrl())
                 .override(200, 200)
                 .apply(RequestOptions.centerCropTransform())
                 .into(holder.imageView);
 
-        holder.imageView.setOnClickListener(view -> {
-                Intent intent = new Intent(context, ImageActivity.class);
-                intent.putExtra("position", position);
-                context.startActivity(intent);
-        });
+        holder.imageView.setOnClickListener(view -> galleryFragment.onImageClick(position));
 
     }
 

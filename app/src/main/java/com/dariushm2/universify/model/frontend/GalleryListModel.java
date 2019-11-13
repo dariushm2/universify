@@ -15,7 +15,6 @@ public class GalleryListModel {
     private List<GalleryModel> galleryModels;
 
 
-
     public GalleryListModel(boolean hasError, boolean isLoading, String errorMessage, List<GalleryModel> galleryModels) {
         this.hasError = hasError;
         this.isLoading = isLoading;
