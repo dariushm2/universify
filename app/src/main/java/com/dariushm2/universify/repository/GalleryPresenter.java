@@ -3,7 +3,6 @@ package com.dariushm2.universify.repository;
 import android.util.Log;
 
 import com.dariushm2.universify.App;
-import com.dariushm2.universify.model.backend.ImageUrls;
 import com.dariushm2.universify.model.backend.ImageUrlsCollection;
 import com.dariushm2.universify.model.frontend.GalleryListModel;
 import com.dariushm2.universify.model.frontend.GalleryModel;
@@ -11,7 +10,6 @@ import com.dariushm2.universify.remote.NasaServices;
 import com.dariushm2.universify.view.gallery.GalleryDataEvents;
 import com.dariushm2.universify.view.image.ImageDataEvents;
 
-import java.io.Serializable;
 import java.util.List;
 
 import io.reactivex.SingleObserver;
@@ -22,7 +20,7 @@ import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subscribers.DisposableSubscriber;
 import retrofit2.Response;
 
-public class GalleryPresenter {
+public final class GalleryPresenter {
 
     private static GalleryDataEvents galleryDataEvents;
 
@@ -34,6 +32,10 @@ public class GalleryPresenter {
 
     private static boolean isInitialized = false;
 
+    private GalleryPresenter() {
+
+    }
+
     public static void init(NasaServices nasaServices, GalleryDataEvents events, String query) {
 
         if (!isInitialized) {
@@ -42,12 +44,10 @@ public class GalleryPresenter {
             disposables = new CompositeDisposable();
             getImages();
             isInitialized = true;
+        } else if (mGalleryListModel != null) {
+            Log.e(App.TAG, "GalleryPresenter is already initialized");
+            galleryDataEvents.setUpAdapterAndView(mGalleryListModel);
         }
-        else
-            if (mGalleryListModel != null) {
-                Log.e(App.TAG, "GalleryPresenter is already initialized");
-                galleryDataEvents.setUpAdapterAndView(mGalleryListModel);
-            }
 
     }
 
@@ -102,6 +102,7 @@ public class GalleryPresenter {
 
     public static void stop() {
         disposables.clear();
+        isInitialized = false;
     }
 
     private static void getImages() {

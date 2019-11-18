@@ -7,7 +7,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -31,7 +30,6 @@ import com.dariushm2.universify.repository.GalleryPresenter;
 import com.github.chrisbanes.photoview.PhotoView;
 
 import java.io.IOException;
-
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
@@ -52,8 +50,22 @@ public class ImageFragment extends Fragment implements ImageDataEvents {
         this.position = position;
     }
 
+    private boolean isFragmentVisible = false;
+
     public static ImageFragment newInstance(int position) {
         return new ImageFragment(position);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        isFragmentVisible = false;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        isFragmentVisible = true;
     }
 
     @Override
@@ -108,7 +120,7 @@ public class ImageFragment extends Fragment implements ImageDataEvents {
     @Override
     public void showImage() {
 
-        Log.e(App.TAG, "showImage " + GalleryPresenter.getImageData(position).getOriginalUrl());
+        //Log.e(App.TAG, "showImage " + GalleryPresenter.getImageData(position).getOriginalUrl());
 
         if (getActivity() != null)
             Glide.with(getActivity())
@@ -117,15 +129,20 @@ public class ImageFragment extends Fragment implements ImageDataEvents {
                         @Override
                         public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
                             if (e != null)
-                                Log.e(App.TAG, e.getMessage());
-                            progressBar.hide();
-                            Toast.makeText(getContext(), R.string.unsupportedFormat, Toast.LENGTH_LONG).show();
+                                //Log.e(App.TAG, e.getMessage());
+
+                                progressBar.hide();
+                            if (isFragmentVisible) {
+                                ///Toast.makeText(getContext(), R.string.unsupportedFormat, Toast.LENGTH_LONG).show();
+                                Toast.makeText(getContext(), " " + position, Toast.LENGTH_SHORT).show();
+                            }
                             return false;
                         }
 
                         @Override
                         public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                            progressBar.hide();
+                            //if (isFragmentVisible)
+                                progressBar.hide();
                             return false;
                         }
                     })

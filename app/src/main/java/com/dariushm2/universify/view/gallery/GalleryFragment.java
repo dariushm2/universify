@@ -88,7 +88,9 @@ public class GalleryFragment extends Fragment implements View.OnClickListener, G
 
 
         if (savedInstanceState == null && getActivity() != null) {
+            Log.e(App.TAG, "saveInstanceState is null");
             App app = (App) getActivity().getApplication();
+
             GalleryPresenter.init(app.getNasaServices(), galleryDataEvents, "universe");
         } else {
             progressBar.hide();
@@ -191,6 +193,7 @@ public class GalleryFragment extends Fragment implements View.OnClickListener, G
     @Override
     public void onDestroy() {
         super.onDestroy();
+        Log.e(App.TAG, "GalleryFragment: onDestroy");
         GalleryPresenter.stop();
     }
 

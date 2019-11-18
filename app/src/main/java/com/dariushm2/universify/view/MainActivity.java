@@ -1,8 +1,12 @@
 package com.dariushm2.universify.view;
 
+import android.content.ContentProvider;
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Bundle;
 
 import com.dariushm2.universify.App;
@@ -14,6 +18,8 @@ import com.google.android.material.snackbar.Snackbar;
 import android.util.Log;
 import android.view.View;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -55,6 +61,8 @@ public class MainActivity extends AppCompatActivity implements InternetConnectio
 
 
         ((App) getApplication()).setInternetConnectionListener(this);
+
+
     }
 
     @Override
