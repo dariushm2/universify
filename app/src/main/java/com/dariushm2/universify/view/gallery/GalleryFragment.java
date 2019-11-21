@@ -107,7 +107,7 @@ public class GalleryFragment extends Fragment implements View.OnClickListener, G
         return view;
     }
 
-    public void onImageClick(int position) {
+    protected void onImageClick(int position) {
         Intent intent = new Intent(getContext(), ImageActivity.class);
         intent.putExtra("position", position);
         if (getActivity() != null)
@@ -128,35 +128,53 @@ public class GalleryFragment extends Fragment implements View.OnClickListener, G
 
     @Override
     public void onClick(View view) {
+
         switch (view.getId()) {
             case R.id.btnUniverse:
                 GalleryPresenter.search(getString(R.string.universe));
+                setSearchQuery(R.string.universe);
                 break;
             case R.id.btnApollo:
                 GalleryPresenter.search(getString(R.string.apollo));
+                setSearchQuery(R.string.apollo);
                 break;
             case R.id.btnMars:
                 GalleryPresenter.search(getString(R.string.mars));
+                setSearchQuery(R.string.mars);
                 break;
             case R.id.btnISS:
                 GalleryPresenter.search(getString(R.string.iss));
+                setSearchQuery(R.string.iss);
                 break;
             case R.id.btnMoon:
                 GalleryPresenter.search(getString(R.string.moon));
+                setSearchQuery(R.string.moon);
                 break;
             case R.id.btnCuriosity:
                 GalleryPresenter.search(getString(R.string.curiosity));
+                setSearchQuery(R.string.curiosity);
                 break;
             case R.id.btnVoyager:
                 GalleryPresenter.search(getString(R.string.voyager));
+                setSearchQuery(R.string.voyager);
                 break;
             case R.id.btnShuttle:
                 GalleryPresenter.search(getString(R.string.shuttle));
+                setSearchQuery(R.string.shuttle);
                 break;
             case R.id.btnRocket:
                 GalleryPresenter.search(getString(R.string.rocket));
+                setSearchQuery(R.string.rocket);
                 break;
         }
+    }
+
+    private void setSearchQuery(int id) {
+        SearchView searchView = null;
+        if (getActivity() != null)
+            searchView = getActivity().findViewById(R.id.searchView);
+        if (searchView != null && getContext() != null)
+            searchView.setQuery(getContext().getString(id), true);
     }
 
     @Override
@@ -201,9 +219,10 @@ public class GalleryFragment extends Fragment implements View.OnClickListener, G
     public static void hideKeyboard(Context mContext) {
         InputMethodManager imm = (InputMethodManager) mContext
                 .getSystemService(Context.INPUT_METHOD_SERVICE);
-        if (imm != null)
-            imm.hideSoftInputFromWindow(((Activity) mContext).getWindow()
-                    .getCurrentFocus().getWindowToken(), 0);
+        View view = ((Activity) mContext).getWindow()
+                .getCurrentFocus();
+        if (imm != null && view != null)
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
 }

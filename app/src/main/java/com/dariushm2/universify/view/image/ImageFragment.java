@@ -133,8 +133,8 @@ public class ImageFragment extends Fragment implements ImageDataEvents {
 
                                 progressBar.hide();
                             if (isFragmentVisible) {
-                                ///Toast.makeText(getContext(), R.string.unsupportedFormat, Toast.LENGTH_LONG).show();
-                                Toast.makeText(getContext(), " " + position, Toast.LENGTH_SHORT).show();
+
+                                Toast.makeText(getContext(), R.string.unsupportedFormat, Toast.LENGTH_SHORT).show();
                             }
                             return false;
                         }

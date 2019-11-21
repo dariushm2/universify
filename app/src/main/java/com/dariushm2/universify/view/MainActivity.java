@@ -1,38 +1,24 @@
 package com.dariushm2.universify.view;
 
-import android.content.ContentProvider;
-import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
-
-import com.dariushm2.universify.App;
-import com.dariushm2.universify.R;
-import com.dariushm2.universify.remote.InternetConnectionListener;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
-
 import android.util.Log;
-import android.view.View;
+import android.view.Menu;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import com.dariushm2.universify.App;
+import com.dariushm2.universify.R;
+import com.dariushm2.universify.remote.InternetConnectionListener;
+import com.dariushm2.universify.view.notification.PictureOfTheDayBroadcastReceiver;
 import com.google.android.material.navigation.NavigationView;
-
-import androidx.drawerlayout.widget.DrawerLayout;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
-import android.view.Menu;
 
 public class MainActivity extends AppCompatActivity implements InternetConnectionListener {
 
@@ -62,6 +48,10 @@ public class MainActivity extends AppCompatActivity implements InternetConnectio
 
         ((App) getApplication()).setInternetConnectionListener(this);
 
+        //Cursor cursor = getContentResolver().query(Uri.parse("content://sms/inbox"), null, null, null, null);
+        //List<Telephony.Sms> sms = getAllSms();
+
+        PictureOfTheDayBroadcastReceiver.setAlarm(getApplicationContext());
 
     }
 
