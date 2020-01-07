@@ -1,7 +1,6 @@
 package com.dariushm2.universify.view;
 
-import android.database.Cursor;
-import android.net.Uri;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -18,6 +17,7 @@ import com.dariushm2.universify.App;
 import com.dariushm2.universify.R;
 import com.dariushm2.universify.remote.InternetConnectionListener;
 import com.dariushm2.universify.view.notification.PictureOfTheDayBroadcastReceiver;
+import com.dariushm2.universify.view.pictureOfTheDay.ScrollingActivity;
 import com.google.android.material.navigation.NavigationView;
 
 public class MainActivity extends AppCompatActivity implements InternetConnectionListener {
@@ -34,25 +34,30 @@ public class MainActivity extends AppCompatActivity implements InternetConnectio
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(menuItem -> {
+            switch (menuItem.getItemId()) {
+                case R.id.nav_picture_of_the_day:
+                    Intent intent = new Intent(MainActivity.this, ScrollingActivity.class);
+                    startActivity(intent);
+                    break;
+            }
+            return true;
+        });
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
-        mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow,
-                R.id.nav_tools, R.id.nav_share, R.id.nav_send)
+        mAppBarConfiguration = new AppBarConfiguration.Builder(R.id.nav_picture_of_the_day)
                 .setDrawerLayout(drawer)
                 .build();
+
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
-        NavigationUI.setupWithNavController(navigationView, navController);
+//        NavigationUI.setupWithNavController(navigationView, navController);
 
 
         ((App) getApplication()).setInternetConnectionListener(this);
 
-        //Cursor cursor = getContentResolver().query(Uri.parse("content://sms/inbox"), null, null, null, null);
-        //List<Telephony.Sms> sms = getAllSms();
 
         PictureOfTheDayBroadcastReceiver.setAlarm(getApplicationContext());
-
     }
 
     @Override

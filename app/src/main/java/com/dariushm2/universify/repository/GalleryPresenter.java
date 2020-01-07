@@ -76,9 +76,8 @@ public final class GalleryPresenter {
                     @Override
                     public void onSuccess(Response<ImageUrlsCollection> response) {
                         if (response.body() != null) {
-                            //Log.e(App.TAG, "onSuccess: " + response.body().getImageUrls().getUrls().get(0).getUrl());
                             mGalleryListModel.getGalleryModels().get(position).setOriginalUrl(
-                                    response.body().getImageUrls().getUrls().get(0).getUrl()
+                                    response.body().getImageUrls().getUrls().get(1).getUrl()
                             );
                             imageDataEvents.showImage();
                         }

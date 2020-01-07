@@ -96,7 +96,6 @@ public class ImageFragment extends Fragment implements ImageDataEvents {
                 myWallpaperManager.setBitmap(bitmap);
                 Toast.makeText(getContext(), R.string.wallpaperChanged, Toast.LENGTH_LONG).show();
             } catch (IOException e) {
-                // TODO Auto-generated catch block
                 Toast.makeText(getContext(), R.string.failedToChangeWallpaper, Toast.LENGTH_LONG).show();
                 e.printStackTrace();
             }

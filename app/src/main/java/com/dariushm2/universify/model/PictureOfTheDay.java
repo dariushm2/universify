@@ -1,6 +1,11 @@
 package com.dariushm2.universify.model;
 
-public class PictureOfTheDay {
+import java.io.Serializable;
+
+public class PictureOfTheDay implements Serializable {
+
+    public static final String PICTURE_OF_THE_DAY = "PictureOfTheDay";
+
     private String title;
     private String explanation;
     private  String date;

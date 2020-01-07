@@ -41,7 +41,8 @@ public class BackendToFrontendModelConverter {
         return nasaServices.getSearchPictures(query,
                 NasaServices.MEDIA_TYPE_IMAGE,
                 pageNumber)
-                .flatMap((Function<ImageSearch, Publisher<GalleryListModel>>) imageSearch -> {
+                .parallel()
+                .map(imageSearch -> {
 
                     Log.e(App.TAG, "fetchImages " + imageSearch.getCollection().getImageItems().size());
 
@@ -81,9 +82,9 @@ public class BackendToFrontendModelConverter {
                         }
                     }
                     Log.e(App.TAG, "converter done " + galleryModels.size());
-                    return Flowable.just(GalleryListModel.success(galleryModels));
+                    return GalleryListModel.success(galleryModels);
                 })
-                .subscribeOn(Schedulers.io());
+                .sequential();
     }
 
 
