@@ -26,6 +26,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 import com.dariushm2.universify.App;
 import com.dariushm2.universify.R;
+import com.dariushm2.universify.remote.InternetConnectionListener;
 import com.dariushm2.universify.repository.GalleryPresenter;
 import com.github.chrisbanes.photoview.PhotoView;
 
@@ -38,6 +39,7 @@ public class ImageFragment extends Fragment implements ImageDataEvents {
 
 
     private ImageDataEvents imageDataEvents;
+    private GalleryPresenter galleryPresenter;
 
     private int position;
 
@@ -55,6 +57,7 @@ public class ImageFragment extends Fragment implements ImageDataEvents {
     public static ImageFragment newInstance(int position) {
         return new ImageFragment(position);
     }
+
 
     @Override
     public void onPause() {
@@ -79,6 +82,7 @@ public class ImageFragment extends Fragment implements ImageDataEvents {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_image, container, false);
 
+        galleryPresenter = GalleryPresenter.getInstance();
         imageDataEvents = this;
 
         imageView = view.findViewById(R.id.img);
@@ -108,8 +112,7 @@ public class ImageFragment extends Fragment implements ImageDataEvents {
 
 
         if (getActivity() != null) {
-            App app = (App) getActivity().getApplication();
-            GalleryPresenter.getUrlsFor(app.getNasaServices(), position, imageDataEvents);
+            galleryPresenter.getUrlsFor(position, imageDataEvents);
         }
 
         return view;
@@ -123,7 +126,7 @@ public class ImageFragment extends Fragment implements ImageDataEvents {
 
         if (getActivity() != null)
             Glide.with(getActivity())
-                    .load(GalleryPresenter.getImageData(position).getOriginalUrl())
+                    .load(galleryPresenter.getImageData(position).getOriginalUrl())
                     .listener(new RequestListener<Drawable>() {
                         @Override
                         public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
@@ -133,7 +136,7 @@ public class ImageFragment extends Fragment implements ImageDataEvents {
                                 progressBar.hide();
                             if (isFragmentVisible) {
 
-                                Toast.makeText(getContext(), R.string.unsupportedFormat, Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
                             }
                             return false;
                         }

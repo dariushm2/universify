@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -37,8 +38,13 @@ public class MainActivity extends AppCompatActivity implements InternetConnectio
         navigationView.setNavigationItemSelectedListener(menuItem -> {
             switch (menuItem.getItemId()) {
                 case R.id.nav_picture_of_the_day:
-                    Intent intent = new Intent(MainActivity.this, ScrollingActivity.class);
-                    startActivity(intent);
+                    App app = (App) getApplication();
+                    if (app.isInternetAvailable()) {
+                        Intent intent = new Intent(MainActivity.this, ScrollingActivity.class);
+                        startActivity(intent);
+                    } else
+                        showNoInternetMessage();
+                    drawer.closeDrawers();
                     break;
             }
             return true;
@@ -86,6 +92,7 @@ public class MainActivity extends AppCompatActivity implements InternetConnectio
     }
 
     private void showNoInternetMessage() {
+        Toast.makeText(getApplicationContext(), "No Internet", Toast.LENGTH_SHORT).show();
         Log.i(App.TAG, "No Internet!");
     }
 }

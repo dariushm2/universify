@@ -3,7 +3,9 @@ package com.dariushm2.universify.view.gallery;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,17 +23,27 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.dariushm2.universify.App;
 import com.dariushm2.universify.R;
 import com.dariushm2.universify.model.frontend.GalleryListModel;
+import com.dariushm2.universify.remote.NasaServices;
+import com.dariushm2.universify.repository.DaggerModelConverterComponent;
+import com.dariushm2.universify.repository.ModelConverter;
+import com.dariushm2.universify.repository.BaseSchedulersProvider;
 import com.dariushm2.universify.repository.GalleryPresenter;
+import com.dariushm2.universify.repository.ModelConverterComponent;
+import com.dariushm2.universify.repository.ModelConverterModule;
+import com.dariushm2.universify.repository.SchedulersProvider;
 import com.dariushm2.universify.view.image.ImageActivity;
+
+import javax.inject.Inject;
 
 
 public class GalleryFragment extends Fragment implements View.OnClickListener, GalleryDataEvents {
 
     private RecyclerView recyclerView;
     private ContentLoadingProgressBar progressBar;
-
+    private GalleryPresenter galleryPresenter;
     private GalleryListModel galleryListModel;
     private GalleryAdapter galleryAdapter;
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -53,7 +65,10 @@ public class GalleryFragment extends Fragment implements View.OnClickListener, G
             searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                 @Override
                 public boolean onQueryTextSubmit(String query) {
-                    GalleryPresenter.search(query);
+                    galleryPresenter.setSearchQuery(query);
+                    galleryPresenter.getNextImages();
+                    Log.e(App.TAG, "onQueryTextSubmit");
+                    saveQueryToPrefs(query);
                     if (getContext() != null)
                         hideKeyboard(getContext());
                     return true;
@@ -75,7 +90,7 @@ public class GalleryFragment extends Fragment implements View.OnClickListener, G
                 super.onScrollStateChanged(recyclerView, newState);
 
                 if (!recyclerView.canScrollVertically(1)) {
-                    GalleryPresenter.next();
+                    galleryPresenter.getNextImages();
                 }
             }
         });
@@ -91,20 +106,35 @@ public class GalleryFragment extends Fragment implements View.OnClickListener, G
             Log.e(App.TAG, "saveInstanceState is null");
             App app = (App) getActivity().getApplication();
 
-            GalleryPresenter.init(app.getNasaServices(), galleryDataEvents, "universe");
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+            String lastSearch = prefs.getString(getString(R.string.lastQuery), "Universe");
+
+            BaseSchedulersProvider schedulersProvider = new SchedulersProvider();
+
+            ModelConverter converter = new ModelConverter(app.getRetrofitFor(NasaServices.BASE_URL_IMAGE_LIBRARY));
+            GalleryPresenter.init(app.getRetrofitFor(NasaServices.BASE_URL_IMAGE_LIBRARY), galleryDataEvents, converter, schedulersProvider);
+            galleryPresenter = GalleryPresenter.getInstance();
+            galleryPresenter.setSearchQuery(lastSearch);
+
+            setSearchQuery(lastSearch);
         } else {
             progressBar.hide();
 
             recyclerView.setAdapter(null);
             recyclerView.setLayoutManager(null);
             recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 5));
-            galleryAdapter = new GalleryAdapter(GalleryPresenter.getGalleryModels(), this);
+            galleryAdapter = new GalleryAdapter(galleryPresenter.getGalleryModels(), this);
             recyclerView.setAdapter(galleryAdapter);
 
             galleryAdapter.notifyDataSetChanged();
         }
 
         return view;
+    }
+
+    private void saveQueryToPrefs(String query) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+        prefs.edit().putString(getString(R.string.lastQuery), query).apply();
     }
 
     protected void onImageClick(int position) {
@@ -131,39 +161,39 @@ public class GalleryFragment extends Fragment implements View.OnClickListener, G
 
         switch (view.getId()) {
             case R.id.btnUniverse:
-                GalleryPresenter.search(getString(R.string.universe));
+                galleryPresenter.setSearchQuery(getString(R.string.universe));
                 setSearchQuery(R.string.universe);
                 break;
             case R.id.btnApollo:
-                GalleryPresenter.search(getString(R.string.apollo));
+                galleryPresenter.setSearchQuery(getString(R.string.apollo));
                 setSearchQuery(R.string.apollo);
                 break;
             case R.id.btnMars:
-                GalleryPresenter.search(getString(R.string.mars));
+                galleryPresenter.setSearchQuery(getString(R.string.mars));
                 setSearchQuery(R.string.mars);
                 break;
             case R.id.btnISS:
-                GalleryPresenter.search(getString(R.string.iss));
+                galleryPresenter.setSearchQuery(getString(R.string.iss));
                 setSearchQuery(R.string.iss);
                 break;
             case R.id.btnMoon:
-                GalleryPresenter.search(getString(R.string.moon));
+                galleryPresenter.setSearchQuery(getString(R.string.moon));
                 setSearchQuery(R.string.moon);
                 break;
             case R.id.btnCuriosity:
-                GalleryPresenter.search(getString(R.string.curiosity));
+                galleryPresenter.setSearchQuery(getString(R.string.curiosity));
                 setSearchQuery(R.string.curiosity);
                 break;
             case R.id.btnVoyager:
-                GalleryPresenter.search(getString(R.string.voyager));
+                galleryPresenter.setSearchQuery(getString(R.string.voyager));
                 setSearchQuery(R.string.voyager);
                 break;
             case R.id.btnShuttle:
-                GalleryPresenter.search(getString(R.string.shuttle));
+                galleryPresenter.setSearchQuery(getString(R.string.shuttle));
                 setSearchQuery(R.string.shuttle);
                 break;
             case R.id.btnRocket:
-                GalleryPresenter.search(getString(R.string.rocket));
+                galleryPresenter.setSearchQuery(getString(R.string.rocket));
                 setSearchQuery(R.string.rocket);
                 break;
         }
@@ -175,6 +205,18 @@ public class GalleryFragment extends Fragment implements View.OnClickListener, G
             searchView = getActivity().findViewById(R.id.searchView);
         if (searchView != null && getContext() != null)
             searchView.setQuery(getContext().getString(id), true);
+       saveQueryToPrefs(getString(id));
+
+    }
+
+    private void setSearchQuery(String query) {
+        SearchView searchView = null;
+        if (getActivity() != null)
+            searchView = getActivity().findViewById(R.id.searchView);
+        if (searchView != null && getContext() != null)
+            searchView.setQuery(query, true);
+        saveQueryToPrefs(query);
+
     }
 
     @Override
@@ -198,13 +240,8 @@ public class GalleryFragment extends Fragment implements View.OnClickListener, G
     }
 
     @Override
-    public void startMainActivity() {
-
-    }
-
-    @Override
     public void showLoadingIndicator() {
-        Log.e(App.TAG, "showLoadingIndicator: ");
+        Log.e(App.TAG, "showLoadingIndicator");
         //progressBar.show();
     }
 
@@ -212,7 +249,7 @@ public class GalleryFragment extends Fragment implements View.OnClickListener, G
     public void onDestroy() {
         super.onDestroy();
         Log.e(App.TAG, "GalleryFragment: onDestroy");
-        GalleryPresenter.stop();
+        galleryPresenter.stop();
     }
 
 

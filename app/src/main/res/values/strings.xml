@@ -34,4 +34,6 @@
 
     <string name="pictureOfTheDay">Picture Of The Day</string>
 
+    <string name="lastQuery">LastQuery</string>
+
 </resources>

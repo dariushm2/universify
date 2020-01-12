@@ -26,6 +26,7 @@ import androidx.viewpager.widget.ViewPager;
 import com.dariushm2.universify.App;
 import com.dariushm2.universify.R;
 import com.dariushm2.universify.model.PictureOfTheDay;
+import com.dariushm2.universify.remote.InternetConnectionListener;
 import com.dariushm2.universify.remote.NasaServices;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -49,10 +50,9 @@ public class ScrollingActivity extends AppCompatActivity {
     private CollapsingToolbarLayout collapsingToolbarLayout;
 
     private Calendar cal = Calendar.getInstance();
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.CANADA);
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
 
     private PictureOfTheDayPresenter presenter = PictureOfTheDayPresenter.init();
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +61,12 @@ public class ScrollingActivity extends AppCompatActivity {
         setContentView(R.layout.activity_scrolling);
 
         initUi();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        ((App) getApplication()).removeInternetConnectionListener();
     }
 
     private void initUi() {
@@ -78,8 +84,10 @@ public class ScrollingActivity extends AppCompatActivity {
                             = WallpaperManager.getInstance(getApplicationContext());
                     try {
                         Bitmap bitmap = getImage();
-                        myWallpaperManager.setBitmap(bitmap);
-                        Toast.makeText(getApplicationContext(), R.string.wallpaperChanged, Toast.LENGTH_LONG).show();
+                        if (bitmap != null) {
+                            myWallpaperManager.setBitmap(bitmap);
+                            Toast.makeText(getApplicationContext(), R.string.wallpaperChanged, Toast.LENGTH_LONG).show();
+                        }
                     } catch (IOException e) {
                         Toast.makeText(getApplicationContext(), R.string.failedToChangeWallpaper, Toast.LENGTH_LONG).show();
                         e.printStackTrace();
@@ -126,7 +134,8 @@ public class ScrollingActivity extends AppCompatActivity {
 
         setDate(position);
 
-        NasaServices.NASA_SERVICES
+        App app = (App) getApplication();
+        app.getRetrofitFor(NasaServices.BASE_URL_PICTURE_OF_THE_DAY)
                 .getPictureOfTheDay(NasaServices.API_KEY, dateFormat.format(cal.getTime()))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

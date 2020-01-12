@@ -8,8 +8,6 @@ public interface GalleryDataEvents {
 
         void showErrorMessage(String error);
 
-        void startMainActivity();
-
         void showLoadingIndicator();
 
 }

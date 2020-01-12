@@ -12,8 +12,22 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    applicationVariants.all { variant ->
+        variant.outputs.all { output ->
+            def project = "Universify"
+            def SEP = "-"
+            def buildType = variant.variantData.variantConfiguration.buildType.name
+            def version = variant.versionName
+            def date = new Date()
+            def formattedDate = date.format('yyyy-MM-dd')
+
+            def newApkName = project + SEP + buildType + SEP + version + SEP + formattedDate + ".apk"
+
+            outputFileName = new File(newApkName)
         }
     }
     compileOptions {
@@ -49,7 +63,11 @@ dependencies {
 
     implementation 'com.github.chrisbanes:PhotoView:2.3.0'
 
+    api 'com.google.dagger:dagger:2.25.3'
+    annotationProcessor 'com.google.dagger:dagger-compiler:2.25.3'
+
     testImplementation 'junit:junit:4.12'
+    testImplementation 'org.mockito:mockito-core:1.10.19'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test:rules:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'

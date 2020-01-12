@@ -21,10 +21,11 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 import com.dariushm2.universify.R;
+import com.github.chrisbanes.photoview.PhotoView;
 
 public class PictureOfTheDayFragment extends Fragment {
 
-    private ImageView imageView;
+    private PhotoView imageView;
     private ContentLoadingProgressBar progressBar;
 
     private String url;
@@ -89,7 +90,10 @@ public class PictureOfTheDayFragment extends Fragment {
     }
 
     protected Bitmap getImage() {
-        return ((BitmapDrawable) imageView.getDrawable()).getBitmap();
+        if (imageView.getDrawable() != null)
+            return ((BitmapDrawable) imageView.getDrawable()).getBitmap();
+        else
+            return null;
     }
 
 }

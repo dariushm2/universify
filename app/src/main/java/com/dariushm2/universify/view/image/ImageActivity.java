@@ -6,6 +6,7 @@ import android.util.SparseArray;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,6 +16,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
+import com.dariushm2.universify.App;
 import com.dariushm2.universify.R;
 import com.dariushm2.universify.repository.GalleryPresenter;
 
@@ -27,8 +29,6 @@ public class ImageActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_image);
 
-        //fullScreen();
-
         ViewPager viewPager = findViewById(R.id.viewPager);
         viewPager.setAdapter(new ImageViewPagerAdapter(getSupportFragmentManager()));
 
@@ -37,14 +37,6 @@ public class ImageActivity extends AppCompatActivity {
             viewPager.setCurrentItem(position);
         }
 
-    }
-
-
-    public void fullScreen() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            Window w = getWindow(); // in Activity's onCreate() for instance
-            w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-        }
     }
 
 
@@ -63,6 +55,8 @@ public class ImageActivity extends AppCompatActivity {
 
         @Override
         public int getCount() {
+            if (GalleryPresenter.getInstance().getGalleryModels() != null)
+                return GalleryPresenter.getInstance().getGalleryModels().size();
             return 1000;
         }
 

@@ -13,11 +13,13 @@ import org.reactivestreams.Publisher;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import io.reactivex.Flowable;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
-public class BackendToFrontendModelConverter {
+public class ModelConverter {
 
     private List<GalleryModel> galleryModels = new ArrayList<>();
     private NasaServices nasaServices;
@@ -25,9 +27,9 @@ public class BackendToFrontendModelConverter {
     private String query;
     private int pageNumber = 0;
 
-    public BackendToFrontendModelConverter(NasaServices nasaServices, String query) {
+    @Inject
+    public ModelConverter(NasaServices nasaServices) {
         this.nasaServices = nasaServices;
-        this.query = query;
     }
 
     protected void reset(String query) {
@@ -39,8 +41,8 @@ public class BackendToFrontendModelConverter {
     public Flowable<GalleryListModel> fetchImages() {
         pageNumber++;
         return nasaServices.getSearchPictures(query,
-                NasaServices.MEDIA_TYPE_IMAGE,
-                pageNumber)
+                                              NasaServices.MEDIA_TYPE_IMAGE,
+                                              pageNumber)
                 .parallel()
                 .map(imageSearch -> {
 

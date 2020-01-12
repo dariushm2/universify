@@ -56,7 +56,6 @@ public class PictureOfTheDayBroadcastReceiver extends BroadcastReceiver {
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         String date = prefs.getString(context.getString(R.string.pictureOfTheDayNotificationChannelId), null);
-        Log.e(App.TAG, date);
         if (date != null)
             if (date.equals(dateFormat.format(calendar.getTime())))
                 return;
@@ -65,10 +64,9 @@ public class PictureOfTheDayBroadcastReceiver extends BroadcastReceiver {
     }
 
     private void getImage() {
-        NasaServices.NASA_SERVICES
-                .getSearchPictures("Mars", "image", 1);
 
-        NasaServices.NASA_SERVICES
+        App app = (App) context.getApplicationContext();
+        app.getRetrofitFor(NasaServices.BASE_URL_PICTURE_OF_THE_DAY)
                 .getPictureOfTheDay(NasaServices.API_KEY)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -81,7 +79,6 @@ public class PictureOfTheDayBroadcastReceiver extends BroadcastReceiver {
                 .doOnError(throwable -> Log.e(App.TAG, throwable.getMessage()))
                 //.doOnSubscribe(Disposable::dispose)
                 .subscribe();
-
     }
 
     private void notifyUser(PictureOfTheDay pictureOfTheDay) {

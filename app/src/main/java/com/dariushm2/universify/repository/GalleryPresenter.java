@@ -12,104 +12,111 @@ import com.dariushm2.universify.view.image.ImageDataEvents;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import io.reactivex.SingleObserver;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subscribers.DisposableSubscriber;
 import retrofit2.Response;
 
 public final class GalleryPresenter {
 
-    private static GalleryDataEvents galleryDataEvents;
+    private GalleryDataEvents galleryDataEvents;
 
-    private static CompositeDisposable disposables;
+    private CompositeDisposable disposables;
 
-    private static BackendToFrontendModelConverter converter;
+    @Inject
+    ModelConverter converter;
 
-    private static GalleryListModel mGalleryListModel;
+    private GalleryListModel mGalleryListModel;
 
-    private static boolean isInitialized = false;
+    private NasaServices nasaServices;
 
-    private GalleryPresenter() {
+    private BaseSchedulersProvider schedulersProvider;
 
+    private static GalleryPresenter galleryPresenter = null;
+
+    private GalleryPresenter(NasaServices nasaServices, GalleryDataEvents events, ModelConverter converter, BaseSchedulersProvider schedulersProvider) {
+        this.nasaServices = nasaServices;
+        this.converter = converter;
+        this.galleryDataEvents = events;
+        this.schedulersProvider = schedulersProvider;
+        disposables = new CompositeDisposable();
     }
 
-    public static void init(NasaServices nasaServices, GalleryDataEvents events, String query) {
-
-        if (!isInitialized) {
-            converter = new BackendToFrontendModelConverter(nasaServices, query);
-            galleryDataEvents = events;
-            disposables = new CompositeDisposable();
-            getImages();
-            isInitialized = true;
-        } else if (mGalleryListModel != null) {
-            Log.e(App.TAG, "GalleryPresenter is already initialized");
-            galleryDataEvents.setUpAdapterAndView(mGalleryListModel);
+    public static void init(NasaServices nasaServices, GalleryDataEvents events, ModelConverter converter, BaseSchedulersProvider schedulersProvider) {
+        if (galleryPresenter == null) {
+            galleryPresenter = new GalleryPresenter(nasaServices, events, converter, schedulersProvider);
         }
-
     }
 
-    public static List<GalleryModel> getGalleryModels() {
-        return mGalleryListModel.getGalleryModels();
+    public static GalleryPresenter getInstance() {
+        return galleryPresenter;
     }
 
-    public static GalleryModel getImageData(int position) {
-        return mGalleryListModel.getGalleryModels().get(position);
-    }
-
-    public static void getUrlsFor(NasaServices nasaServices, int position, ImageDataEvents imageDataEvents) {
-        if (mGalleryListModel.getGalleryModels().get(position).getOriginalUrl() != null) {
-            imageDataEvents.showImage();
-            return;
-        }
-        nasaServices.getUrlsForAsset(mGalleryListModel.getGalleryModels().get(position).getNasaId())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new SingleObserver<Response<ImageUrlsCollection>>() {
-                    @Override
-                    public void onSubscribe(Disposable d) {
-
-                    }
-
-                    @Override
-                    public void onSuccess(Response<ImageUrlsCollection> response) {
-                        if (response.body() != null) {
-                            mGalleryListModel.getGalleryModels().get(position).setOriginalUrl(
-                                    response.body().getImageUrls().getUrls().get(1).getUrl()
-                            );
-                            imageDataEvents.showImage();
-                        }
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Log.e(App.TAG, "onError " + e.getMessage());
-                    }
-                });
-    }
-
-    public static void next() {
-        getImages();
-    }
-
-    public static void search(String query) {
+    public void setSearchQuery(String query) {
         converter.reset(query);
-        getImages();
     }
 
-    public static void stop() {
+
+    public void stop() {
         disposables.clear();
-        isInitialized = false;
+        galleryPresenter = null;
+        mGalleryListModel.getGalleryModels().clear();
     }
 
-    private static void getImages() {
+    public List<GalleryModel> getGalleryModels() {
+        if (mGalleryListModel != null)
+            return mGalleryListModel.getGalleryModels();
+        return null;
+    }
 
+    public GalleryModel getImageData(int position) {
+        if (mGalleryListModel != null)
+            return mGalleryListModel.getGalleryModels().get(position);
+        return null;
+    }
+
+    public void getUrlsFor(int position, ImageDataEvents imageDataEvents) {
+        if (mGalleryListModel.getGalleryModels().size() > position)
+            if (mGalleryListModel.getGalleryModels().get(position).getOriginalUrl() != null) {
+                imageDataEvents.showImage();
+                return;
+            }
+        if (mGalleryListModel.getGalleryModels().size() > position)
+            nasaServices.getUrlsForAsset(mGalleryListModel.getGalleryModels().get(position).getNasaId())
+                    .subscribeOn(schedulersProvider.io())
+                    .observeOn(schedulersProvider.ui())
+                    .subscribe(new SingleObserver<Response<ImageUrlsCollection>>() {
+                        @Override
+                        public void onSubscribe(Disposable d) {
+
+                        }
+
+                        @Override
+                        public void onSuccess(Response<ImageUrlsCollection> response) {
+                            if (response.body() != null) {
+                                mGalleryListModel.getGalleryModels().get(position).setOriginalUrl(
+                                        response.body().getImageUrls().getUrls().get(1).getUrl()
+                                );
+                                imageDataEvents.showImage();
+                            }
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            Log.e(App.TAG, "onError " + e.getMessage());
+                        }
+                    });
+    }
+
+
+    public void getNextImages() {
         disposables.add(
                 converter.fetchImages()
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeOn(schedulersProvider.io())
+                        .observeOn(schedulersProvider.ui())
                         .startWith(GalleryListModel.loading())
                         .onErrorReturn(throwable ->
                                 GalleryListModel.error(throwable.getMessage())

@@ -4,6 +4,8 @@ import android.app.Application;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Handler;
+import android.os.Looper;
 
 import com.dariushm2.universify.remote.InternetConnectionListener;
 import com.dariushm2.universify.remote.NasaServices;
@@ -17,10 +19,11 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class App extends Application {
 
 
-    public static final String TAG = "Universify: ";
+    public static final String TAG = "Universify";
 
 
-    private NasaServices nasaServices;
+    private NasaServices nasaServicesForImageLibrary;
+    private NasaServices nasaServicesForPictureOfTheDay;
     private InternetConnectionListener mInternetConnectionListener;
 
     @Override
@@ -37,7 +40,7 @@ public class App extends Application {
     }
 
 
-    private boolean isInternetAvailable() {
+    public boolean isInternetAvailable() {
         ConnectivityManager connectivityManager
                 = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = null;
@@ -46,21 +49,28 @@ public class App extends Application {
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
-    public NasaServices getNasaServices() {
-        if (nasaServices == null) {
-            nasaServices = provideRetrofit().create(NasaServices.class);
+    public NasaServices getRetrofitFor(String baseUrl) {
+        if (baseUrl.equals(NasaServices.BASE_URL_IMAGE_LIBRARY)) {
+            if (nasaServicesForImageLibrary == null) {
+                nasaServicesForImageLibrary = provideRetrofitFor(baseUrl).create(NasaServices.class);
+            }
+            return nasaServicesForImageLibrary;
         }
-        return nasaServices;
+        if (nasaServicesForPictureOfTheDay == null) {
+            nasaServicesForPictureOfTheDay = provideRetrofitFor(baseUrl).create(NasaServices.class);
+        }
+        return nasaServicesForPictureOfTheDay;
     }
 
-    private Retrofit provideRetrofit() {
+    private Retrofit provideRetrofitFor(String baseUrl) {
         return new Retrofit.Builder()
-                .baseUrl(NasaServices.BASE_URL_IMAGE_LIBRARY)
+                .baseUrl(baseUrl)
                 .client(provideOkHttpClient())
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
     }
+
 
     private OkHttpClient provideOkHttpClient() {
         OkHttpClient.Builder okHttpClientBuilder = new OkHttpClient.Builder();
@@ -76,8 +86,11 @@ public class App extends Application {
 
             @Override
             public void onInternetUnavailable() {
+
                 if (mInternetConnectionListener != null) {
-                    mInternetConnectionListener.onInternetUnavailable();
+                    new Handler(Looper.getMainLooper()).post(() -> {
+                        mInternetConnectionListener.onInternetUnavailable();
+                    });
                 }
             }
         });

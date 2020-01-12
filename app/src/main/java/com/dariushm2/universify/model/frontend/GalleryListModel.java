@@ -8,7 +8,6 @@ import java.util.List;
 
 public class GalleryListModel {
 
-
     private boolean hasError;
     private boolean isLoading;
     private String errorMessage;

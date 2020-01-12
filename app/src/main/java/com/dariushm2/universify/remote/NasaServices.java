@@ -19,18 +19,12 @@ import retrofit2.http.Query;
 
 public interface NasaServices {
 
+    String BASE_URL_PICTURE_OF_THE_DAY = "https://api.nasa.gov/";
     String BASE_URL_IMAGE_LIBRARY = "https://images-api.nasa.gov";
-    NasaServices NASA_SERVICES = new Retrofit.Builder()
-            .baseUrl(NasaServices.BASE_URL)
-            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-            .create(NasaServices.class);
 
 
     String API_KEY = "61oeOYHyVnw4ZYue06NKOooohsmaWQy4cmGsNrwi";
     String MEDIA_TYPE_IMAGE = "image";
-    String BASE_URL = "https://api.nasa.gov/";
 
 
     @GET("/search")
